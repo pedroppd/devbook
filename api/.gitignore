@@ -1,0 +1,38 @@
+# Executáveis e binários compilados
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.a
+*.o
+*.lo
+*.la
+*.swp
+
+# Diretórios de build e cache do Go
+/bin/
+/pkg/
+/data/
+# Arquivos de dependências gerados
+vendor/
+
+# Módulos do Go
+go.sum
+
+# Diretórios de cache do Go
+$GOPATH/pkg/
+$GOPATH/bin/
+
+# Configurações do IDE
+.vscode/
+.idea/
+*.iml
+
+# Arquivos temporários e logs
+*.log
+*.tmp
+
+# Arquivos de teste
+*.test
+.api/data/
