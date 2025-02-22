@@ -13,4 +13,4 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,    
     userpassword VARCHAR(255) NOT NULL UNIQUE,
     createdAt timestamp default current_timestamp()
-) ENGINE=INNODB;
+);
