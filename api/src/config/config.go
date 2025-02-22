@@ -14,7 +14,7 @@ var (
 	Port               = 0
 )
 
-func Load() {
+func LoadEnvs() {
 	var erro error
 
 	if erro = godotenv.Load(); erro != nil {
@@ -26,8 +26,8 @@ func Load() {
 		Port = 9000
 	}
 
-	ConnectionDatabase = fmt.Sprintf("%s:%s/%s?charset=utf8&parseTime=True&loc=Local",
-		os.Getenv("DB_USUARIO"),
-		os.Getenv("DB_SENHA"),
-		os.Getenv("DB_NOME"))
+	ConnectionDatabase = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s?charset=utf8&parseTime=True&loc=Local",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"))
 }

@@ -10,7 +10,7 @@ import (
 
 func main() {
 	fmt.Println("Running API ...")
-	config.Load()
+	config.LoadEnvs()
 	router := router.Gerar()
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), router))
 }

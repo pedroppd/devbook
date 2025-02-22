@@ -1,10 +1,8 @@
-DROP DATABASE IF EXISTS;
-
-CREATE DATABASE devbook;
+CREATE DATABASE IF NOT EXISTS devbook;
 
 USE devbook;
 
-DROP TABLE IF EXISTS;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -12,5 +10,5 @@ CREATE TABLE users (
     nick VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,    
     userpassword VARCHAR(255) NOT NULL UNIQUE,
-    createdAt timestamp default current_timestamp()
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
