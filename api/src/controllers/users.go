@@ -4,36 +4,41 @@ import (
 	"api/src/database"
 	"api/src/models"
 	"api/src/repository"
+	"api/src/responses"
 	"encoding/json"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		responses.Erro(w, http.StatusUnprocessableEntity, err)
+		return
 	}
 
 	var user models.User
 
 	if err = json.Unmarshal(requestBody, &user); err != nil {
-		log.Fatal(err)
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
 	}
 
 	databaseConnector, err := database.ToConnect()
 	if err != nil {
-		log.Fatal(err)
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
 	}
+	defer databaseConnector.Close()
 	print("Entrei no método create user userRepository")
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	userID, err := userRepository.Create(user)
+	user.ID, err = userRepository.Create(user)
+
 	if err != nil {
-		log.Fatal(err)
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
 	}
-	w.Write([]byte(fmt.Sprintf("Id inserted successfully : %d", userID)))
+	responses.JSON(w, http.StatusCreated, user)
 }
 
 func FindUsers(w http.ResponseWriter, r *http.Request) {
