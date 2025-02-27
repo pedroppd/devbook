@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +36,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer databaseConnector.Close()
-	print("Entrei no método create user userRepository")
+
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
 	user.ID, err = userRepository.Create(user)
 
@@ -47,11 +48,27 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func FindUsers(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Finding users"))
+	userNameOrNick := strings.ToLower(r.URL.Query().Get("user"))
+
+	databaseConnector, err := database.ToConnect()
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer databaseConnector.Close()
+
+	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
+	usersResult, err := userRepository.FindByNameOrNick(userNameOrNick)
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, usersResult)
 }
 
 func FindUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Finding user"))
+	w.Write([]byte("Finding users"))
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
