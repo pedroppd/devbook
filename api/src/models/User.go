@@ -38,5 +38,12 @@ func (user *User) removeWhiteSpace() {
 	user.Nome = strings.TrimSpace(user.Nome)
 	user.Nick = strings.TrimSpace(user.Nome)
 	user.Email = strings.TrimSpace(user.Nome)
-	user.Password = strings.TrimSpace(user.Nome)
+}
+
+func (user *User) Prepare() error {
+	if erro := user.validate(); erro != nil {
+		return erro
+	}
+	user.removeWhiteSpace()
+	return nil
 }
