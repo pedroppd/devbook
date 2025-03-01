@@ -37,6 +37,26 @@ func (repository User) Create(user models.User) (uint64, error) {
 	return uint64(lastID), nil
 }
 
+func (repository User) FindByID(id uint64) (models.User, error) {
+	var user models.User
+
+	statement, erro := repository.db.Prepare("select id, username, nick, email, createdAt from users where id = ?")
+
+	if erro != nil {
+		return user, erro
+	}
+
+	defer statement.Close()
+
+	err := statement.QueryRow(id).Scan(&user.ID, &user.Nome, &user.Nick, &user.Email, &user.CreatedAt)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
 func (repository User) FindByNameOrNick(nameOrNick string) ([]models.User, error) {
 	queryParam := fmt.Sprintf("%%%s%%", nameOrNick)
 

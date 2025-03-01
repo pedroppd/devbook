@@ -9,6 +9,6 @@ CREATE TABLE users (
     username VARCHAR(255) NOT NULL,
     nick VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,    
-    userpassword VARCHAR(255) NOT NULL UNIQUE,
+    userpassword VARCHAR(255) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

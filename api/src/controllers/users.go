@@ -6,9 +6,13 @@ import (
 	"api/src/repository"
 	"api/src/responses"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +43,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
 	user.ID, err = userRepository.Create(user)
-
+	fmt.Println("Dps de pegar no banco")
+	fmt.Println(user)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
@@ -68,7 +73,28 @@ func FindUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func FindUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Finding users"))
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	databaseConnector, err := database.ToConnect()
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer databaseConnector.Close()
+
+	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
+	usersResult, err := userRepository.FindByID(id)
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, usersResult)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
