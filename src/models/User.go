@@ -15,20 +15,21 @@ type User struct {
 }
 
 func (user *User) validate() error {
+
 	if user.Nome == "" {
 		return errors.New("Name cannot be null")
 	}
 
 	if user.Nick == "" {
-		return errors.New("Name cannot be null")
+		return errors.New("Nick cannot be null")
 	}
 
 	if user.Email == "" {
-		return errors.New("Name cannot be null")
+		return errors.New("Email cannot be null")
 	}
 
 	if user.Password == "" {
-		return errors.New("Name cannot be null")
+		return errors.New("Password cannot be null")
 	}
 
 	return nil

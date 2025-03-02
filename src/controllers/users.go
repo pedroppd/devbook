@@ -6,7 +6,6 @@ import (
 	"api/src/repository"
 	"api/src/responses"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -43,8 +42,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
 	user.ID, err = userRepository.Create(user)
-	fmt.Println("Dps de pegar no banco")
-	fmt.Println(user)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
@@ -98,7 +95,45 @@ func FindUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Updating user"))
+
+	//Getting parameter
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//Getting body
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		responses.Erro(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	var user models.User
+
+	if err = json.Unmarshal(requestBody, &user); err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//Database connection
+	databaseConnector, err := database.ToConnect()
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer databaseConnector.Close()
+
+	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
+	usersResult, err := userRepository.Update(id, user)
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, usersResult)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
