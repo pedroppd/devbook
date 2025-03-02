@@ -37,7 +37,7 @@ func (repository User) Create(user models.User) (uint64, error) {
 	return uint64(lastID), nil
 }
 
-// Create - Create a user in database
+// Update - Update a user in database
 func (repository User) Update(userID uint64, user models.User) error {
 	stmt, err := repository.db.Prepare("update users set username = ?, nick = ?, email = ? where id = ?")
 
@@ -47,6 +47,22 @@ func (repository User) Update(userID uint64, user models.User) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(user.Nome, user.Nick, user.Email, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Create - Create a user in database
+func (repository User) DeleteByID(userID uint64) error {
+	stmt, err := repository.db.Prepare("delete from users where id = ?")
+
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(userID)
 	if err != nil {
 		return err
 	}
