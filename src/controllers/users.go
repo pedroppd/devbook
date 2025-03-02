@@ -127,13 +127,13 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	defer databaseConnector.Close()
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	usersResult, err := userRepository.Update(id, user)
+	err = userRepository.Update(id, user)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	responses.JSON(w, http.StatusOK, usersResult)
+	responses.JSON(w, http.StatusNoContent, nil)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {

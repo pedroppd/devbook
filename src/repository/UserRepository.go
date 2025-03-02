@@ -38,26 +38,19 @@ func (repository User) Create(user models.User) (uint64, error) {
 }
 
 // Create - Create a user in database
-func (repository User) Update(userID uint64, user models.User) (uint64, error) {
+func (repository User) Update(userID uint64, user models.User) error {
 	stmt, err := repository.db.Prepare("update users set username = ?, nick = ?, email = ? where id = ?")
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 	defer stmt.Close()
 
-	resultset, err := stmt.Exec(user.Nome, user.Nick, user.Email, userID)
+	_, err = stmt.Exec(user.Nome, user.Nick, user.Email, userID)
 	if err != nil {
-		return 0, err
+		return err
 	}
-
-	lastID, err := resultset.LastInsertId()
-
-	if err != nil {
-		return 0, err
-	}
-
-	return uint64(lastID), nil
+	return nil
 }
 
 func (repository User) FindByID(id uint64) (models.User, error) {
