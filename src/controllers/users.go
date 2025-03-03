@@ -28,7 +28,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = user.Prepare(); err != nil {
+	if err = user.Prepare("register"); err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
 		return
 	}
@@ -114,6 +114,11 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 
 	if err = json.Unmarshal(requestBody, &user); err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err = user.Prepare("register"); err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
 		return
 	}

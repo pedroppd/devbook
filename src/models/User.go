@@ -3,6 +3,8 @@ package models
 import (
 	"errors"
 	"strings"
+
+	"github.com/badoux/checkmail"
 )
 
 type User struct {
@@ -14,7 +16,7 @@ type User struct {
 	CreatedAt string `json:"createdAt,omitempty"`
 }
 
-func (user *User) validate() error {
+func (user *User) validate(step string) error {
 
 	if user.Nome == "" {
 		return errors.New("Name cannot be null")
@@ -28,7 +30,11 @@ func (user *User) validate() error {
 		return errors.New("Email cannot be null")
 	}
 
-	if user.Password == "" {
+	if erro := checkmail.ValidateFormat(user.Email); erro != nil {
+		return errors.New("Email is invalid")
+	}
+
+	if step == "register" && user.Password == "" {
 		return errors.New("Password cannot be null")
 	}
 
@@ -41,8 +47,8 @@ func (user *User) removeWhiteSpace() {
 	user.Email = strings.TrimSpace(user.Email)
 }
 
-func (user *User) Prepare() error {
-	if erro := user.validate(); erro != nil {
+func (user *User) Prepare(step string) error {
+	if erro := user.validate(step); erro != nil {
 		return erro
 	}
 	user.removeWhiteSpace()
