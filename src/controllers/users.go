@@ -118,7 +118,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = user.Prepare("register"); err != nil {
+	if err = user.Prepare("update"); err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
 		return
 	}
