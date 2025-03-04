@@ -115,3 +115,23 @@ func (repository User) FindByNameOrNick(nameOrNick string) ([]models.User, error
 	}
 	return users, nil
 }
+
+func (repository User) FindByEmail(email string) (models.User, error) {
+
+	lines, erro := repository.db.Query("select id, email from users where email  = ?", email)
+
+	if erro != nil {
+		return models.User{}, erro
+	}
+
+	defer lines.Close()
+
+	var user models.User
+
+	for lines.Next() {
+		if erro = lines.Scan(&user.ID, &user.Email); erro != nil {
+			return models.User{}, erro
+		}
+	}
+	return user, nil
+}
