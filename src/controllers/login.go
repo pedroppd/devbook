@@ -5,6 +5,7 @@ import (
 	"api/src/models"
 	"api/src/repository"
 	"api/src/responses"
+	"api/src/security"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -34,10 +35,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	//Repository
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	user.ID, err = userRepository.Create(user)
+	userResponse, err := userRepository.FindByEmail(user.Email)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
 	}
 
+	if err = security.CheckPassword(userResponse.Password, user.Password); err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, nil)
 }
