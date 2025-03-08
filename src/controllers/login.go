@@ -8,7 +8,6 @@ import (
 	"api/src/responses"
 	"api/src/security"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -38,7 +37,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//Repository
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
 	userResponse, err := userRepository.FindByEmail(user.Email)
-	fmt.Println(userResponse)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
@@ -54,6 +52,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
 	}
-	fmt.Println(token)
 	responses.JSON(w, http.StatusOK, token)
 }

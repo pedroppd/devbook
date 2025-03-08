@@ -12,6 +12,7 @@ import (
 var (
 	ConnectionDatabase = ""
 	Port               = 0
+	Secret             = ""
 )
 
 func LoadEnvs() {
@@ -23,8 +24,10 @@ func LoadEnvs() {
 
 	Port, erro = strconv.Atoi(os.Getenv("API_PORT"))
 	if erro != nil {
-		Port = 9000
+		Port = 0
 	}
+
+	Secret = os.Getenv("SECRET_KEY")
 
 	ConnectionDatabase = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s?charset=utf8&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
