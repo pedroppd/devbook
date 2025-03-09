@@ -2,7 +2,6 @@ package responses
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -11,7 +10,6 @@ func JSON(w http.ResponseWriter, statusCode int, dados interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	if dados != nil {
 		if erro := json.NewEncoder(w).Encode(dados); erro != nil {
-			log.Println(erro)
 			Erro(w, http.StatusInternalServerError, erro)
 		}
 	}
