@@ -43,7 +43,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = security.CheckPassword(userResponse.Password, user.Password); err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
+		responses.JSON(w, http.StatusInternalServerError, err)
 		return
 	}
 
