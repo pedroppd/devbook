@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repository"
 	"api/src/responses"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -96,11 +98,23 @@ func FindUser(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
+	userIDFromToken, err := authentication.GetUserIdFromToken(r)
+	if err != nil {
+		responses.Erro(w, http.StatusUnauthorized, err)
+		return
+	}
+
 	//Getting parameter
 	vars := mux.Vars(r)
 	id, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if userIDFromToken != id {
+		fmt.Printf("User not allowed - %d", userIDFromToken)
+		responses.Erro(w, http.StatusForbidden, err)
 		return
 	}
 

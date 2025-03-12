@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -53,6 +52,20 @@ func extractTokenFromHeader(r *http.Request) string {
 		return tokenSplited[1]
 	}
 	return ""
+}
+
+func GetUserIdFromToken(r *http.Request) (uint64, error) {
+	tokenString := extractTokenFromHeader(r)
+	token, err := jwt.Parse(tokenString, getVerificationKey)
+	if err != nil {
+		return 0, err
+	}
+
+	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return permissions["usuarioId"].(uint64), nil
+	}
+
+	return 0, errors.New("Invalid token")
 }
 
 type TokenStruct struct {
