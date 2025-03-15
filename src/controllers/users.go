@@ -7,6 +7,7 @@ import (
 	"api/src/repository"
 	"api/src/responses"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -161,6 +162,18 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	userIDFromToken, err := authentication.GetUserIdFromToken(r)
+	if err != nil {
+		responses.Erro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if userIDFromToken != id {
+		errorMessage := fmt.Sprintf("User not allowed - %d", userIDFromToken)
+		responses.Erro(w, http.StatusForbidden, errors.New(errorMessage))
 		return
 	}
 

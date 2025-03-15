@@ -27,8 +27,11 @@ func CreateToken(userID uint64) (TokenStruct, error) {
 
 func ValidateToken(r *http.Request) error {
 	tokenString := extractTokenFromHeader(r)
+
 	token, err := jwt.Parse(tokenString, getVerificationKey)
 	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("erro está aqui")
 		return err
 	}
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -37,11 +40,12 @@ func ValidateToken(r *http.Request) error {
 	return errors.New("Invalid token")
 }
 
+// SigningMethodHMAC
 func getVerificationKey(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("Method sign unexpected : %v", token.Header["alg"])
 	}
-	return config.Secret, nil
+	return []byte(config.Secret), nil
 }
 
 func extractTokenFromHeader(r *http.Request) string {
