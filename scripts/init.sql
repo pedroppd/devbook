@@ -12,3 +12,11 @@ CREATE TABLE users (
     userpassword VARCHAR(255) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE followers (
+    user_id INT NOT NULL, 
+    follower_id INT NOT NULL,
+    PRIMARY KEY (user_id, follower_id),
+    FOREIGN KEY follower_id REFERENCES users(id) on DELETE CASCADE,
+    FOREIGN KEY user_id REFERENCES users(id) on DELETE CASCADE
+);
