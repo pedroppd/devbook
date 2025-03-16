@@ -13,10 +13,14 @@ CREATE TABLE users (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS followers;
+
 CREATE TABLE followers (
     user_id INT NOT NULL, 
     follower_id INT NOT NULL,
     PRIMARY KEY (user_id, follower_id),
-    FOREIGN KEY follower_id REFERENCES users(id) on DELETE CASCADE,
-    FOREIGN KEY user_id REFERENCES users(id) on DELETE CASCADE
+    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+

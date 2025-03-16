@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -66,7 +67,11 @@ func GetUserIdFromToken(r *http.Request) (uint64, error) {
 	}
 
 	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return permissions["usuarioId"].(uint64), nil
+		id, err := strconv.ParseUint(fmt.Sprintf("%.0f", permissions["usuarioId"]), 10, 64)
+		if err != nil {
+			return 0, err
+		}
+		return id, nil
 	}
 
 	return 0, errors.New("Invalid token")
