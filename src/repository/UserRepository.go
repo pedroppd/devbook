@@ -155,7 +155,6 @@ func (repository User) Follow(userID, followerID uint64) error {
 
 func (repository User) UnFollow(userID, followerID uint64) error {
 	statement, erro := repository.db.Prepare("delete from followers where user_id = ? and follower_id = ?")
-
 	if erro != nil {
 		return erro
 	}
@@ -168,4 +167,33 @@ func (repository User) UnFollow(userID, followerID uint64) error {
 	}
 
 	return nil
+}
+
+func (repository User) FindFollowersByID(userID uint64) ([]models.User, error) {
+
+	lines, erro := repository.db.Query(`select user.id, user.username, user.nick, user.email, 
+	user.createdAt from followers follower inner join users user on user.id = follower.follower_id 
+	where follower.user_id = ?`, userID)
+
+	if erro != nil {
+		return []models.User{}, erro
+	}
+
+	defer lines.Close()
+
+	var users []models.User
+
+	for lines.Next() {
+		var user models.User
+		if erro = lines.Scan(&user.ID,
+			&user.Nome,
+			&user.Nick,
+			&user.Email,
+			&user.CreatedAt); erro != nil {
+			return nil, erro
+		}
+		users = append(users, user)
+
+	}
+	return users, nil
 }
