@@ -6,6 +6,7 @@ import (
 	"api/src/models"
 	"api/src/repository"
 	"api/src/responses"
+	"api/src/security"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -307,11 +308,76 @@ func FindFollowing(w http.ResponseWriter, r *http.Request) {
 	defer databaseConnector.Close()
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	users, err := userRepository.FindFollowersByID(userIDToFollow)
+	users, err := userRepository.FindFollowingByID(userIDToFollow)
 
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
 	}
 	responses.JSON(w, http.StatusNoContent, users)
+}
+
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	//Getting parameter
+	/* 	vars := mux.Vars(r)
+	   	userIDToFollow, err := strconv.ParseUint(vars["id"], 10, 64)
+	   	if err != nil {
+	   		responses.Erro(w, http.StatusBadRequest, err)
+	   		return
+	   	}
+	*/
+	userID, err := authentication.GetUserIdFromToken(r)
+	if err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//Getting body
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		responses.Erro(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	var passoword models.Password
+
+	if err = json.Unmarshal(requestBody, &passoword); err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	databaseConnector, err := database.ToConnect()
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer databaseConnector.Close()
+
+	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
+	userPassword, err := userRepository.FindPassword(userID)
+
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	checkErr := security.CheckPassword(userPassword, passoword.Current)
+	if checkErr != nil {
+		responses.Erro(w, http.StatusInternalServerError, errors.New("Password is not the current one"))
+		return
+	}
+
+	hashNewPassword, errHashPassword := security.Hash(passoword.New)
+	if errHashPassword != nil {
+		responses.Erro(w, http.StatusInternalServerError, errors.New("Something went wrog to try create a hash for the password"))
+		return
+	}
+
+	errUpdate := userRepository.UpdatePassword(userID, string(hashNewPassword))
+
+	if errUpdate != nil {
+		responses.Erro(w, http.StatusInternalServerError, errors.New("Something went wrog to try update the password"))
+		return
+	}
+	responses.JSON(w, http.StatusNoContent, nil)
 }

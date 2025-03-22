@@ -49,9 +49,15 @@ var userRoutes = []Router{
 		RequiredAuthentication: true,
 	},
 	{
-		URI:                    "/users/{id}/followin",
+		URI:                    "/users/{id}/following",
 		Method:                 http.MethodGet,
-		Func:                   controllers.FindFollowin,
+		Func:                   controllers.FindFollowing,
+		RequiredAuthentication: true,
+	},
+	{
+		URI:                    "/users/{id}/update-password",
+		Method:                 http.MethodGet,
+		Func:                   controllers.FindFollowing,
 		RequiredAuthentication: true,
 	},
 }
