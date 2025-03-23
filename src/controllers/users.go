@@ -232,7 +232,7 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 func UnFollowUser(w http.ResponseWriter, r *http.Request) {
 	//Getting parameter
 	vars := mux.Vars(r)
-	userIDToFollow, err := strconv.ParseUint(vars["id"], 10, 64)
+	userIDToUnFollow, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
 		return
@@ -244,8 +244,8 @@ func UnFollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if userID == userIDToFollow {
-		errorMessage := fmt.Sprintf("Cant unfollow youself - %d - %d", userID, userIDToFollow)
+	if userID == userIDToUnFollow {
+		errorMessage := fmt.Sprintf("Cant unfollow youself - %d - %d", userID, userIDToUnFollow)
 		responses.Erro(w, http.StatusForbidden, errors.New(errorMessage))
 		return
 	}
@@ -258,7 +258,7 @@ func UnFollowUser(w http.ResponseWriter, r *http.Request) {
 	defer databaseConnector.Close()
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	if err := userRepository.UnFollow(userID, userIDToFollow); err != nil {
+	if err := userRepository.UnFollow(userID, userIDToUnFollow); err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -294,7 +294,7 @@ func FindFollowers(w http.ResponseWriter, r *http.Request) {
 func FindFollowing(w http.ResponseWriter, r *http.Request) {
 	//Getting parameter
 	vars := mux.Vars(r)
-	userIDToFollow, err := strconv.ParseUint(vars["id"], 10, 64)
+	userIDFollowing, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
 		return
@@ -308,8 +308,7 @@ func FindFollowing(w http.ResponseWriter, r *http.Request) {
 	defer databaseConnector.Close()
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	users, err := userRepository.FindFollowingByID(userIDToFollow)
-
+	users, err := userRepository.FindFollowingByID(userIDFollowing)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
 		return
@@ -319,16 +318,22 @@ func FindFollowing(w http.ResponseWriter, r *http.Request) {
 
 func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	//Getting parameter
-	/* 	vars := mux.Vars(r)
-	   	userIDToFollow, err := strconv.ParseUint(vars["id"], 10, 64)
-	   	if err != nil {
-	   		responses.Erro(w, http.StatusBadRequest, err)
-	   		return
-	   	}
-	*/
+	vars := mux.Vars(r)
+	userIDFromPath, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
 	userID, err := authentication.GetUserIdFromToken(r)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if userID != userIDFromPath {
+		errorMessage := fmt.Sprintf("Cant update passoword of another user- %d - %d", userID, userIDFromPath)
+		responses.Erro(w, http.StatusForbidden, errors.New(errorMessage))
 		return
 	}
 
@@ -354,7 +359,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	defer databaseConnector.Close()
 
 	userRepository := repository.NewRepositoryUserDatabase(databaseConnector)
-	userPassword, err := userRepository.FindPassword(userID)
+	userPassword, err := userRepository.FindPassword(userIDFromPath)
 
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)

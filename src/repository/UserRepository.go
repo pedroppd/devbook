@@ -145,7 +145,7 @@ func (repository User) Follow(userID, followerID uint64) error {
 
 	defer statement.Close()
 
-	_, err := statement.Exec(userID, followerID)
+	_, err := statement.Exec(followerID, userID)
 	if err != nil {
 		return err
 	}
